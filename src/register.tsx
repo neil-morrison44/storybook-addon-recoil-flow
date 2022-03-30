@@ -1,7 +1,7 @@
 import React from "react"
 import { addons, types } from "@storybook/addons"
 import { AddonPanel } from "@storybook/components"
-import { atom, RecoilRoot, selector } from "recoil"
+import { atom, RecoilRoot, selector, useRecoilValue } from "recoil"
 import { FlowGraph } from "./flow/graph"
 
 const ADDON_ID = "recoil-flow"
@@ -17,6 +17,19 @@ export const SelectorOne = selector<string>({
     return `${atomValue} ${atomTwoValue} selected!`
   },
 })
+
+export const AtomThree = atom<string>({ default: "hello", key: "AtomThree" })
+
+export const SelectorTwo = selector<string>({
+  key: "SelectorTwo",
+  get: ({ get }) => {
+    const atomValue = get(AtomThree)
+    const selectorValue = get(SelectorOne)
+    return `${atomValue} ${selectorValue} selected!`
+  },
+})
+
+export const AtomFour = atom<string>({ default: "hello", key: "AtomFour" })
 
 // give a unique name for the panel
 const MyPanel = () => (

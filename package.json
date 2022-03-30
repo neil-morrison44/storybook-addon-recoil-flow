@@ -41,6 +41,7 @@
     "@storybook/addon-links": "^6.4.19",
     "@storybook/react": "^6.4.19",
     "@storybook/testing-library": "^0.0.9",
+    "@types/d3": "^7.1.0",
     "babel-loader": "^8.2.4"
   }
 }

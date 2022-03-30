@@ -1,24 +1,30 @@
-import React, { useEffect, useState } from "react"
+import React, { ReactElement, useEffect, useState } from "react"
 import ReactFlow, { MiniMap, Controls, Node, Edge } from "react-flow-renderer"
 import { useRecoilSnapshot, useRecoilValue } from "recoil"
 import { SelectorOne } from "../register"
+import * as d3 from "d3"
+import { SimulationNodeDatum } from "d3-force"
 
-interface RecoilNode extends Node {}
+interface RecoilNode extends Node {
+  data: {
+    label: ReactElement
+    contents: any
+    type: "atom" | "selector"
+  }
+}
 interface RecoilEdge extends Edge {}
 
-export const FlowGraph = () => {
+interface RecoilSimulationNodeDatum extends SimulationNodeDatum {
+  recoilNode: RecoilNode
+}
+
+const useRecoilNodesAndEdges = () => {
   const snapshot = useRecoilSnapshot()
   const [nodes, setNodes] = useState<RecoilNode[]>([])
   const [edges, setEdges] = useState<RecoilEdge[]>([])
 
-  useRecoilValue(SelectorOne)
-
   useEffect(() => {
-    console.debug("Changed Atoms:")
     const snapshotNodes = Array.from(snapshot.getNodes_UNSTABLE())
-
-    console.log("nodes!")
-
     setNodes(
       snapshotNodes.map((snapshotNode): RecoilNode => {
         const value = snapshot.getLoadable(snapshotNode)
@@ -43,15 +49,15 @@ export const FlowGraph = () => {
       })
     )
 
-    console.log("edges!")
     setEdges(
       snapshotNodes.flatMap((snapshotNode): RecoilEdge[] => {
-        const value = snapshot.getLoadable(snapshotNode)
         const info = snapshot.getInfo_UNSTABLE(snapshotNode)
-        console.log("node!", JSON.stringify(info))
-        console.log(info.deps)
+        const deps = Array.from(info.deps)
+        const componentSubs = Array.from(info.subscribers.components)
 
-        return Array.from(info.deps).map((dep) => ({
+        console.log({ componentSubs })
+
+        return deps.map((dep) => ({
           id: `${snapshotNode.key}-${dep.key}`,
           source: dep.key,
           target: snapshotNode.key,
@@ -59,23 +65,96 @@ export const FlowGraph = () => {
         }))
       })
     )
-
-    for (const node of snapshot.getNodes_UNSTABLE()) {
-      console.debug(node.key, snapshot.getLoadable(node))
-    }
   }, [snapshot])
+  return { nodes, edges }
+}
+
+const useForceDirectedGraph = ({
+  nodes,
+  edges,
+}: {
+  nodes: RecoilNode[]
+  edges: RecoilEdge[]
+}): { nodes: RecoilNode[]; edges: RecoilEdge[]; firstRender: boolean } => {
+  const [positionedNodes, setPositionedNodes] = useState<RecoilNode[]>([])
+  const [firstRender, setFirstRender] = useState<boolean>(false)
+
+  useEffect(() => {
+    const simNodes: RecoilSimulationNodeDatum[] = nodes.map((node, index) => ({
+      index,
+      id: node.id,
+      recoilNode: node,
+      x: node.position.x,
+      y: node.position.y,
+    }))
+
+    const sim = d3
+      .forceSimulation<RecoilSimulationNodeDatum>(simNodes)
+      .force("charge", d3.forceManyBody().strength(5))
+      .force("center", d3.forceCenter(500 / 2, 500 / 2))
+      .force(
+        "y",
+        d3
+          .forceY<RecoilSimulationNodeDatum>()
+          .y(({ recoilNode }) => (recoilNode.data.type === "atom" ? -100 : 0))
+          .strength(5)
+      )
+      .force(
+        "collision",
+        d3.forceCollide().radius((d) => 100)
+      )
+      .force(
+        "link",
+        d3.forceLink().links(
+          edges.map(({ source, target }) => ({
+            source: simNodes.findIndex(
+              ({ recoilNode }) => recoilNode.id === source
+            ),
+            target: simNodes.findIndex(
+              ({ recoilNode }) => recoilNode.id === target
+            ),
+          }))
+        )
+      )
+      .on("tick", () => {
+        setPositionedNodes(
+          simNodes.map(({ recoilNode, x, y }) => ({
+            ...recoilNode,
+            position: { x: x || 0, y: y || 0 },
+          }))
+        )
+      })
+      .on("end", () => {
+        setFirstRender(true)
+      })
+
+    return () => {
+      sim.stop()
+    }
+  }, [nodes, edges])
+
+  return { edges, nodes: positionedNodes, firstRender }
+}
+
+export const FlowGraph = () => {
+  const { nodes, edges } = useRecoilNodesAndEdges()
+  const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
+  useRecoilValue(SelectorOne)
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        fitView
-        nodesDraggable={false}
-        nodesConnectable={false}
-      >
-        <Controls />
-      </ReactFlow>
+      {!firstRender && <div>{"Generating Graph..."}</div>}
+      {firstRender && (
+        <ReactFlow
+          nodes={pNodes}
+          edges={edges}
+          fitView
+          nodesDraggable={false}
+          nodesConnectable={false}
+        >
+          <Controls showInteractive={false} />
+        </ReactFlow>
+      )}
     </div>
   )
 }
