@@ -1,7 +1,7 @@
 import React from "react"
 import { addons, types } from "@storybook/addons"
 import { AddonPanel } from "@storybook/components"
-import { atom, RecoilRoot, selector, useRecoilValue } from "recoil"
+import { atom, atomFamily, RecoilRoot, selector, useRecoilValue } from "recoil"
 import { FlowGraph } from "./flow/graph"
 
 const ADDON_ID = "recoil-flow"
@@ -30,6 +30,11 @@ export const SelectorTwo = selector<string>({
 })
 
 export const AtomFour = atom<string>({ default: "hello", key: "AtomFour" })
+
+export const AtomFamilyOne = atomFamily({
+  key: "AtomFamilyOne",
+  default: "world",
+})
 
 // give a unique name for the panel
 const MyPanel = () => (

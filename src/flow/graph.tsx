@@ -1,9 +1,15 @@
-import React, { ReactElement, useEffect, useState } from "react"
+import React, {
+  ReactElement,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import ReactFlow, { MiniMap, Controls, Node, Edge } from "react-flow-renderer"
-import { useRecoilSnapshot, useRecoilValue } from "recoil"
-import { SelectorOne } from "../register"
+import { useRecoilCallback, useRecoilSnapshot, useRecoilValue } from "recoil"
+import { AtomFamilyOne, SelectorOne } from "../register"
 import * as d3 from "d3"
-import { SimulationNodeDatum } from "d3-force"
+import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force"
 
 interface RecoilNode extends Node {
   data: {
@@ -12,21 +18,25 @@ interface RecoilNode extends Node {
     type: "atom" | "selector"
   }
 }
+
+type RecoilNodeWithoutPosition = Omit<RecoilNode, "position">
+
 interface RecoilEdge extends Edge {}
 
 interface RecoilSimulationNodeDatum extends SimulationNodeDatum {
-  recoilNode: RecoilNode
+  recoilNode: RecoilNodeWithoutPosition
 }
 
 const useRecoilNodesAndEdges = () => {
   const snapshot = useRecoilSnapshot()
-  const [nodes, setNodes] = useState<RecoilNode[]>([])
+  const [nodes, setNodes] = useState<RecoilNodeWithoutPosition[]>([])
   const [edges, setEdges] = useState<RecoilEdge[]>([])
 
   useEffect(() => {
+    console.log("snapshot changed!")
     const snapshotNodes = Array.from(snapshot.getNodes_UNSTABLE())
     setNodes(
-      snapshotNodes.map((snapshotNode): RecoilNode => {
+      snapshotNodes.map((snapshotNode): RecoilNodeWithoutPosition => {
         const value = snapshot.getLoadable(snapshotNode)
         const info = snapshot.getInfo_UNSTABLE(snapshotNode)
         return {
@@ -40,10 +50,6 @@ const useRecoilNodesAndEdges = () => {
             ),
             contents: value.contents,
             type: info.type,
-          },
-          position: {
-            x: Math.random() * 500,
-            y: info.type === "atom" ? 50 : 150,
           },
         }
       })
@@ -73,31 +79,70 @@ const useForceDirectedGraph = ({
   nodes,
   edges,
 }: {
-  nodes: RecoilNode[]
+  nodes: RecoilNodeWithoutPosition[]
   edges: RecoilEdge[]
 }): { nodes: RecoilNode[]; edges: RecoilEdge[]; firstRender: boolean } => {
   const [positionedNodes, setPositionedNodes] = useState<RecoilNode[]>([])
   const [firstRender, setFirstRender] = useState<boolean>(false)
+  const simNodeMapRef = useRef<{ [k: string]: RecoilSimulationNodeDatum }>({})
+
+  const simNodes: RecoilSimulationNodeDatum[] = useMemo(
+    () =>
+      nodes.map((node, index) => {
+        if (simNodeMapRef.current[node.id]) {
+          simNodeMapRef.current[node.id].recoilNode = node
+          return simNodeMapRef.current[node.id]
+        }
+
+        return (simNodeMapRef.current[node.id] = {
+          index,
+          recoilNode: node,
+          x: 0,
+          y: 0,
+        })
+      }),
+    [nodes]
+  )
+
+  const fakeFamilyLinks: SimulationLinkDatum<RecoilSimulationNodeDatum>[] =
+    useMemo(() => {
+      const familyGroups: { [k: string]: RecoilSimulationNodeDatum[] } =
+        simNodes.reduce((groups, node) => {
+          if (!node.recoilNode.id.includes("__")) return []
+          const [familyName] = node.recoilNode.id.split("__")
+          groups[familyName] ||= []
+          groups[familyName].push(node)
+
+          return groups
+        }, {}) || {}
+
+      const fakeLinks = Object.entries(familyGroups)
+        .map(([familyName, nodes]) =>
+          nodes.flatMap((source) =>
+            nodes
+              .filter((target) => target !== source)
+              .map((target) => ({
+                source: source.index || 0,
+                target: target.index || 0,
+              }))
+          )
+        )
+        .flat()
+      console.log({ fakeLinks })
+      return fakeLinks
+    }, [simNodes])
 
   useEffect(() => {
-    const simNodes: RecoilSimulationNodeDatum[] = nodes.map((node, index) => ({
-      index,
-      id: node.id,
-      recoilNode: node,
-      x: node.position.x,
-      y: node.position.y,
-    }))
-
     const sim = d3
       .forceSimulation<RecoilSimulationNodeDatum>(simNodes)
-      .force("charge", d3.forceManyBody().strength(5))
-      .force("center", d3.forceCenter(500 / 2, 500 / 2))
+      .force("charge", d3.forceManyBody().strength(2))
+      .force("center", d3.forceCenter(500 / 2, 500 / 2).strength(1.5))
       .force(
         "y",
         d3
           .forceY<RecoilSimulationNodeDatum>()
           .y(({ recoilNode }) => (recoilNode.data.type === "atom" ? -100 : 0))
-          .strength(5)
+          .strength(0.5)
       )
       .force(
         "collision",
@@ -105,16 +150,17 @@ const useForceDirectedGraph = ({
       )
       .force(
         "link",
-        d3.forceLink().links(
-          edges.map(({ source, target }) => ({
+        d3.forceLink().links([
+          ...fakeFamilyLinks,
+          ...edges.map(({ source, target }) => ({
             source: simNodes.findIndex(
               ({ recoilNode }) => recoilNode.id === source
             ),
             target: simNodes.findIndex(
               ({ recoilNode }) => recoilNode.id === target
             ),
-          }))
-        )
+          })),
+        ])
       )
       .on("tick", () => {
         setPositionedNodes(
@@ -140,6 +186,22 @@ export const FlowGraph = () => {
   const { nodes, edges } = useRecoilNodesAndEdges()
   const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
   useRecoilValue(SelectorOne)
+
+  useRecoilValue(AtomFamilyOne("key-two"))
+
+  const setNew = useRecoilCallback(
+    ({ set }) =>
+      () => {
+        set(AtomFamilyOne("key"), "New Value!")
+      },
+    []
+  )
+
+  useEffect(() => {
+    setTimeout(() => {
+      setNew()
+    }, 20 * 1000)
+  }, [])
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
