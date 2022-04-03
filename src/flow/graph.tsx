@@ -5,9 +5,11 @@ import React, {
   useRef,
   useState,
 } from "react"
+
 import ReactFlow, { MiniMap, Controls, Node, Edge } from "react-flow-renderer"
-import { useRecoilCallback, useRecoilSnapshot, useRecoilValue } from "recoil"
-import { AtomFamilyOne, SelectorOne } from "../register"
+// import { useRecoilCallback, useRecoilSnapshot, useRecoilValue } from "recoil"
+// import { AtomFamilyOne, SelectorOne } from "../register"
+import { useChannel } from "@storybook/api"
 import * as d3 from "d3"
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force"
 
@@ -25,54 +27,6 @@ interface RecoilEdge extends Edge {}
 
 interface RecoilSimulationNodeDatum extends SimulationNodeDatum {
   recoilNode: RecoilNodeWithoutPosition
-}
-
-const useRecoilNodesAndEdges = () => {
-  const snapshot = useRecoilSnapshot()
-  const [nodes, setNodes] = useState<RecoilNodeWithoutPosition[]>([])
-  const [edges, setEdges] = useState<RecoilEdge[]>([])
-
-  useEffect(() => {
-    console.log("snapshot changed!")
-    const snapshotNodes = Array.from(snapshot.getNodes_UNSTABLE())
-    setNodes(
-      snapshotNodes.map((snapshotNode): RecoilNodeWithoutPosition => {
-        const value = snapshot.getLoadable(snapshotNode)
-        const info = snapshot.getInfo_UNSTABLE(snapshotNode)
-        return {
-          id: snapshotNode.key,
-          data: {
-            label: (
-              <div>
-                <div>{`${info.type}: ${snapshotNode.key}`}</div>
-                <div>{value.contents}</div>
-              </div>
-            ),
-            contents: value.contents,
-            type: info.type,
-          },
-        }
-      })
-    )
-
-    setEdges(
-      snapshotNodes.flatMap((snapshotNode): RecoilEdge[] => {
-        const info = snapshot.getInfo_UNSTABLE(snapshotNode)
-        const deps = Array.from(info.deps)
-        const componentSubs = Array.from(info.subscribers.components)
-
-        console.log({ componentSubs })
-
-        return deps.map((dep) => ({
-          id: `${snapshotNode.key}-${dep.key}`,
-          source: dep.key,
-          target: snapshotNode.key,
-          animated: true,
-        }))
-      })
-    )
-  }, [snapshot])
-  return { nodes, edges }
 }
 
 const useForceDirectedGraph = ({
@@ -128,7 +82,6 @@ const useForceDirectedGraph = ({
           )
         )
         .flat()
-      console.log({ fakeLinks })
       return fakeLinks
     }, [simNodes])
 
@@ -182,26 +135,49 @@ const useForceDirectedGraph = ({
   return { edges, nodes: positionedNodes, firstRender }
 }
 
-export const FlowGraph = () => {
-  const { nodes, edges } = useRecoilNodesAndEdges()
-  const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
-  useRecoilValue(SelectorOne)
+const useRemoteRecoilNodesAndEdges = () => {
+  const [nodes, setNodes] = useState<RecoilNodeWithoutPosition[]>([])
+  const [edges, setEdges] = useState<RecoilEdge[]>([])
 
-  useRecoilValue(AtomFamilyOne("key-two"))
-
-  const setNew = useRecoilCallback(
-    ({ set }) =>
-      () => {
-        set(AtomFamilyOne("key"), "New Value!")
+  useChannel(
+    {
+      "recoil-flow-changed": ({
+        nodes: n,
+        edges: e,
+      }: {
+        nodes: RecoilNodeWithoutPosition[]
+        edges: RecoilEdge[]
+      }) => {
+        setNodes(n)
+        setEdges(e)
       },
+    },
     []
   )
 
-  useEffect(() => {
-    setTimeout(() => {
-      setNew()
-    }, 20 * 1000)
-  }, [])
+  return { nodes, edges }
+}
+
+export const FlowGraph = () => {
+  const { nodes, edges } = useRemoteRecoilNodesAndEdges()
+  const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
+  // useRecoilValue(SelectorOne)
+
+  // useRecoilValue(AtomFamilyOne("key-two"))
+
+  // const setNew = useRecoilCallback(
+  //   ({ set }) =>
+  //     () => {
+  //       set(AtomFamilyOne("key"), "New Value!")
+  //     },
+  //   []
+  // )
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setNew()
+  //   }, 20 * 1000)
+  // }, [])
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
@@ -215,6 +191,7 @@ export const FlowGraph = () => {
           nodesConnectable={false}
         >
           <Controls showInteractive={false} />
+          <MiniMap />
         </ReactFlow>
       )}
     </div>

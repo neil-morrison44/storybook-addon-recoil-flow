@@ -2,7 +2,7 @@
   "name": "storybook-addon-recoil-flow",
   "version": "0.0.1",
   "description": "Shows a graph of the current recoil state",
-  "main": "index.js",
+  "main": "dist/preset.js",
   "scripts": {
     "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,6 +10,9 @@
     "build-storybook": "build-storybook",
     "build-then-storybook": "npm run build && npm run storybook"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "storybook",
     "addons",
@@ -35,11 +38,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
-    "@storybook/addon-actions": "^6.4.19",
-    "@storybook/addon-essentials": "^6.4.19",
-    "@storybook/addon-interactions": "^6.4.19",
-    "@storybook/addon-links": "^6.4.19",
-    "@storybook/react": "^6.4.19",
+    "@storybook/addon-actions": "^6.4.20",
+    "@storybook/addon-essentials": "^6.4.20",
+    "@storybook/addon-interactions": "^6.4.20",
+    "@storybook/addon-links": "^6.4.20",
+    "@storybook/react": "^6.4.20",
     "@storybook/testing-library": "^0.0.9",
     "@types/d3": "^7.1.0",
     "babel-loader": "^8.2.4"
