@@ -7,8 +7,6 @@ import React, {
 } from "react"
 
 import ReactFlow, { MiniMap, Controls, Node, Edge } from "react-flow-renderer"
-// import { useRecoilCallback, useRecoilSnapshot, useRecoilValue } from "recoil"
-// import { AtomFamilyOne, SelectorOne } from "../register"
 import { useChannel } from "@storybook/api"
 import * as d3 from "d3"
 import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force"

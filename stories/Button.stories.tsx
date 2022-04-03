@@ -3,6 +3,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react"
 import { withRecoilFlow } from "../dist/decorator"
 import { Button } from "./Button"
 import { RecoilRoot } from "recoil"
+import { AtomFour } from "./testRecoilThings"
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
@@ -15,8 +16,11 @@ export default {
   decorators: [
     withRecoilFlow,
     (storyFn) => (
-      <RecoilRoot>
-        {"world"}
+      <RecoilRoot
+        initializeState={({ set }) => {
+          set(AtomFour, "test-hello")
+        }}
+      >
         {storyFn()}
       </RecoilRoot>
     ),
