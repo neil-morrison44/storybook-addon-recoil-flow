@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
     "build-storybook": "build-storybook",
-    "build-then-storybook": "npm run build && npm run storybook"
+    "build-then-storybook": "npm run build && npm run storybook",
+    "prepack": "npm run build"
   },
   "files": [
     "preset.js",
