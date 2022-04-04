@@ -59,5 +59,14 @@
   "peerDependencies": {
     "react": "^17.0.0",
     "@storybook/addons": "^6.4.0"
-  }
+  },
+  "types": "./dist/preset.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neil-morrison44/storybook-addon-recoil-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neil-morrison44/storybook-addon-recoil-flow/issues"
+  },
+  "homepage": "https://github.com/neil-morrison44/storybook-addon-recoil-flow#readme"
 }
