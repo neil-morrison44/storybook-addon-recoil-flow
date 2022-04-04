@@ -21,3 +21,5 @@ Ensure that this addon & whichever one is providing the RecoilRoot are in the co
 
 - Install via npm / yarn
 - The decorator provides a `RecoilRoot` with `overrides` set to false so the method in 1 will work without another decorator (but you'll not be able to set up a custom initialiser)
+
+![Screenshot](/images/screenshot.png)
