@@ -18,9 +18,7 @@ interface RecoilNode extends Node {
     type: "atom" | "selector"
   }
 }
-
 type RecoilNodeWithoutPosition = Omit<RecoilNode, "position">
-
 interface RecoilEdge extends Edge {}
 
 interface RecoilSimulationNodeDatum extends SimulationNodeDatum {
@@ -159,24 +157,6 @@ const useRemoteRecoilNodesAndEdges = () => {
 export const FlowGraph = () => {
   const { nodes, edges } = useRemoteRecoilNodesAndEdges()
   const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
-  // useRecoilValue(SelectorOne)
-
-  // useRecoilValue(AtomFamilyOne("key-two"))
-
-  // const setNew = useRecoilCallback(
-  //   ({ set }) =>
-  //     () => {
-  //       set(AtomFamilyOne("key"), "New Value!")
-  //     },
-  //   []
-  // )
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setNew()
-  //   }, 20 * 1000)
-  // }, [])
-
   return (
     <div style={{ width: "100%", height: "100%" }}>
       {!firstRender && <div>{"Generating Graph..."}</div>}

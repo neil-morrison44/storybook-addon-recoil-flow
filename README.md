@@ -2,6 +2,8 @@
 
 Adds a panel to monitor the entire state of recoil for your story.
 
+![Recoil Flow Logo](/images/logo.png)
+
 ## Setup
 
 ### Method 1: The Recoil Root is provided by another decorator addon
