@@ -30,7 +30,7 @@ export const useRecoilNodesAndEdges = () => {
             label: (
               <div>
                 <div>{`${info.type}: ${snapshotNode.key}`}</div>
-                <div>{value.contents}</div>
+                <div>{JSON.stringify(value.contents)}</div>
               </div>
             ),
             contents: value.contents,

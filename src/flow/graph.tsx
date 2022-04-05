@@ -101,14 +101,19 @@ const useForceDirectedGraph = ({
         "link",
         d3.forceLink().links([
           ...fakeFamilyLinks,
-          ...edges.map(({ source, target }) => ({
-            source: simNodes.findIndex(
-              ({ recoilNode }) => recoilNode.id === source
-            ),
-            target: simNodes.findIndex(
-              ({ recoilNode }) => recoilNode.id === target
-            ),
-          })),
+          ...edges
+            .map(({ source, target }) => ({
+              source: simNodes.findIndex(
+                ({ recoilNode }) => recoilNode.id === source
+              ),
+              target: simNodes.findIndex(
+                ({ recoilNode }) => recoilNode.id === target
+              ),
+            }))
+            .filter(({ source, target }) => {
+              if (source !== -1 && target !== -1) return true
+              return false
+            }),
         ])
       )
       .on("tick", () => {
