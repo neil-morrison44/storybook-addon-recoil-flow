@@ -132,8 +132,10 @@ const useForceDirectedGraph = ({
 }
 
 const useRemoteRecoilNodesAndEdges = () => {
-  const [nodes, setNodes] = useState<RecoilNodeWithoutPosition[]>([])
-  const [edges, setEdges] = useState<RecoilEdge[]>([])
+  const [nodesAndEdges, setNodesAndEdges] = useState<{
+    nodes: RecoilNodeWithoutPosition[]
+    edges: RecoilEdge[]
+  }>({ nodes: [], edges: [] })
 
   useChannel(
     {
@@ -144,14 +146,16 @@ const useRemoteRecoilNodesAndEdges = () => {
         nodes: RecoilNodeWithoutPosition[]
         edges: RecoilEdge[]
       }) => {
-        setNodes(n)
-        setEdges(e)
+        setNodesAndEdges({
+          nodes: n,
+          edges: e,
+        })
       },
     },
     []
   )
 
-  return { nodes, edges }
+  return nodesAndEdges
 }
 
 export const FlowGraph = () => {
