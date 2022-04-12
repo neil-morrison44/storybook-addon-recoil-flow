@@ -42,10 +42,28 @@ Secondary.args = {
   label: "Button",
 }
 
+Secondary.parameters = {
+  recoilFlow: {
+    filter: {
+      keys: ["AtomOne"],
+      showConnected: true,
+    },
+  },
+}
+
 export const Large = Template.bind({})
 Large.args = {
   size: "large",
   label: "Button",
+}
+
+Large.parameters = {
+  recoilFlow: {
+    filter: {
+      keys: ["AtomOne", "AtomFour"],
+      showConnected: false,
+    },
+  },
 }
 
 export const Small = Template.bind({})

@@ -29,3 +29,20 @@ Ensure that this addon & whichever one is providing the RecoilRoot are in the co
 - It's a bit ugly
 - The graph doesn't lay itself out very well
 - We're not using most of the features of React Flow so we could replace it with something smaller
+
+## Parameters
+
+The `recoilFlow` parameter has the following optional options:
+
+```js
+  recoilFlow: {
+    filter: {
+      keys: ["AtomOne"],
+      showConnected: true,
+    },
+  },
+```
+
+The `keys` array gets used in a `.startsWith` to filter out nodes so the long generated SelectorFamilyKeys can be matched with just the manually entered bit.
+
+`showConnected` will show nodes which are connected to those in the `keys` array as well (defaults to true)

@@ -3,11 +3,49 @@ import { makeDecorator, useChannel, useCallback } from "@storybook/addons"
 import { useRecoilNodesAndEdges } from "../hooks/useRecoilNodesAndEdges"
 import { RecoilRoot } from "recoil"
 
-const RecoilSnooper = ({ emit }: { emit: any }) => {
+const RecoilSnooper = ({
+  emit,
+  allowedKeys,
+  showConnected,
+}: {
+  emit: any
+  allowedKeys: string[]
+  showConnected: boolean
+}) => {
   const { edges, nodes } = useRecoilNodesAndEdges()
+  let filteredNodes = [...nodes]
+  if (allowedKeys.length > 0)
+    filteredNodes = nodes.filter(({ id }) =>
+      allowedKeys.some((k) => id.startsWith(k))
+    )
+
+  if (allowedKeys && showConnected) {
+    const connectedNodes = new Set<typeof nodes[0]>()
+    do {
+      filteredNodes.push(...Array.from(connectedNodes))
+      const filteredNodeKeys = filteredNodes.map(({ id }) => id)
+      connectedNodes.clear()
+
+      edges.forEach(({ source, target }) => {
+        const sourceKnown = filteredNodeKeys.includes(source)
+        const targetKnown = filteredNodeKeys.includes(target)
+        if (sourceKnown !== targetKnown) {
+          if (sourceKnown)
+            connectedNodes.add(
+              nodes.find(({ id }) => id === target) as typeof nodes[0]
+            )
+
+          if (targetKnown)
+            connectedNodes.add(
+              nodes.find(({ id }) => id === source) as typeof nodes[0]
+            )
+        }
+      })
+    } while (connectedNodes.size > 0)
+  }
 
   useEffect(() => {
-    emit("recoil-flow-changed", { nodes, edges })
+    emit("recoil-flow-changed", { nodes: filteredNodes, edges })
   }, [edges, nodes])
   return null
 }
@@ -20,10 +58,16 @@ export const withRecoilFlow = makeDecorator({
     const emitCallback = useCallback((eventName: string, data: any) => {
       emit(eventName, data)
     }, [])
+    const allowedKeys = parameters.filter?.keys || []
+    const showConnected = parameters.filter?.showConnected ?? true
 
     return (
       <RecoilRoot override={false}>
-        <RecoilSnooper emit={emitCallback} />
+        <RecoilSnooper
+          emit={emitCallback}
+          allowedKeys={allowedKeys}
+          showConnected={showConnected}
+        />
         {storyFn()}
       </RecoilRoot>
     )
