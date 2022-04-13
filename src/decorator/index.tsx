@@ -30,15 +30,11 @@ const RecoilSnooper = ({
         const sourceKnown = filteredNodeKeys.includes(source)
         const targetKnown = filteredNodeKeys.includes(target)
         if (sourceKnown !== targetKnown) {
-          if (sourceKnown)
-            connectedNodes.add(
-              nodes.find(({ id }) => id === target) as typeof nodes[0]
-            )
+          const targetNode = nodes.find(({ id }) => id === target)
+          const sourceNode = nodes.find(({ id }) => id === source)
 
-          if (targetKnown)
-            connectedNodes.add(
-              nodes.find(({ id }) => id === source) as typeof nodes[0]
-            )
+          if (sourceKnown && targetNode) connectedNodes.add(targetNode)
+          if (targetKnown && sourceNode) connectedNodes.add(sourceNode)
         }
       })
     } while (connectedNodes.size > 0)
