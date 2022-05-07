@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-recoil-flow",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "Shows a graph of the current recoil state",
   "main": "dist/preset.js",
   "scripts": {
@@ -46,21 +46,21 @@
   },
   "devDependencies": {
     "react": "^17.0.0",
-    "recoil": "^0.6.1",
+    "recoil": "^0.7.2",
     "@babel/core": "^7.17.8",
-    "@storybook/addon-actions": "^6.4.20",
-    "@storybook/addon-essentials": "^6.4.20",
-    "@storybook/addon-interactions": "^6.4.20",
-    "@storybook/addon-links": "^6.4.20",
-    "@storybook/react": "^6.4.20",
-    "@storybook/testing-library": "^0.0.9",
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-essentials": "^6.4.22",
+    "@storybook/addon-interactions": "^6.4.22",
+    "@storybook/addon-links": "^6.4.22",
+    "@storybook/react": "^6.4.22",
+    "@storybook/testing-library": "^0.0.11",
     "@types/d3": "^7.1.0",
     "babel-loader": "^8.2.4"
   },
   "peerDependencies": {
     "react": "^17.0.0",
     "@storybook/addons": "^6.4.0",
-    "recoil": "^0.6.1"
+    "recoil": ">= 0.6.1"
   },
   "types": "./dist/preset.d.ts",
   "repository": {
