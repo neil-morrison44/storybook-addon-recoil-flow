@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-recoil-flow",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Shows a graph of the current recoil state",
   "main": "dist/preset.js",
   "scripts": {
@@ -56,7 +56,8 @@
   },
   "peerDependencies": {
     "@storybook/addons": "^6.4.0",
-    "react": "^17.0.0 || ^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "recoil": ">= 0.6.1"
   },
   "types": "./dist/preset.d.ts",
