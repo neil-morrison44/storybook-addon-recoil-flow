@@ -26,9 +26,9 @@ Ensure that this addon & whichever one is providing the RecoilRoot are in the co
 
 ## Known Issues
 
-- It's a bit ugly
-- The graph doesn't lay itself out very well
-- We're not using most of the features of React Flow so we could replace it with something smaller
+- ~~It's a bit ugly~~ No longer ugly
+- ~~The graph doesn't lay itself out very well~~ Now it does
+- ~~We're not using most of the features of React Flow so we could replace it with something smaller~~ Switched to https://github.com/reaviz/reagraph
 
 ## Parameters
 

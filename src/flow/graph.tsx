@@ -10,6 +10,7 @@ import {
 } from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
 import { FlowInfo } from "./info"
+import { usePanelPosition } from "../hooks/usePanelPosition"
 
 const RECOIL_BLUE = "#5a91ea"
 
@@ -49,6 +50,7 @@ export const FlowGraph = () => {
       nodes,
       edges,
     })
+  const panelPosition = usePanelPosition()
 
   const noData = nodes.length + edges.length === 0
   return (
@@ -57,9 +59,9 @@ export const FlowGraph = () => {
         width: "100%",
         height: "100%",
         display: "flex",
-        // this should switch flex direction depending on the panel position
         gap: "1px",
         background: "rgba(0,0,0,0.1)",
+        flexDirection: panelPosition === "bottom" ? "row" : "column",
       }}
     >
       {noData && <div>{"No Recoil Nodes found"}</div>}
