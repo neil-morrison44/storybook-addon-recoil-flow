@@ -1,38 +1,23 @@
 import React from "react"
-import { useState, useEffect, ReactElement } from "react"
-import { Edge, Node } from "react-flow-renderer"
+import { useState, useEffect } from "react"
 import { useRecoilSnapshot } from "recoil"
-
-interface RecoilNode extends Node {
-  data: {
-    label: ReactElement
-    contents: any
-    type: "atom" | "selector"
-  }
-}
-type RecoilNodeWithoutPosition = Omit<RecoilNode, "position">
-interface RecoilEdge extends Edge {}
+import { RecoilEdge, RecoilNode } from "../types"
 
 export const useRecoilNodesAndEdges = () => {
   const snapshot = useRecoilSnapshot()
-  const [nodes, setNodes] = useState<RecoilNodeWithoutPosition[]>([])
+  const [nodes, setNodes] = useState<RecoilNode[]>([])
   const [edges, setEdges] = useState<RecoilEdge[]>([])
 
   useEffect(() => {
     const snapshotNodes = Array.from(snapshot.getNodes_UNSTABLE())
     setNodes(
-      snapshotNodes.map((snapshotNode): RecoilNodeWithoutPosition => {
+      snapshotNodes.map((snapshotNode): RecoilNode => {
         const value = snapshot.getLoadable(snapshotNode)
         const info = snapshot.getInfo_UNSTABLE(snapshotNode)
         return {
           id: snapshotNode.key,
+          label: snapshotNode.key,
           data: {
-            label: (
-              <>
-                <div key="node-title">{`${info.type}: ${snapshotNode.key}`}</div>
-                <div key="node-value">{JSON.stringify(value.contents)}</div>
-              </>
-            ),
             contents: value.contents,
             type: info.type,
           },

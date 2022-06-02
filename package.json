@@ -1,10 +1,10 @@
 {
   "name": "storybook-addon-recoil-flow",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shows a graph of the current recoil state",
   "main": "dist/preset.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "npx tsc --skipLibCheck",
     "test": "echo \"Error: no test specified\" && exit 1",
     "storybook": "start-storybook -p 6006 --no-manager-cache",
     "build-storybook": "build-storybook",
@@ -37,29 +37,26 @@
   "author": "Neil Morrison",
   "license": "MIT",
   "dependencies": {
-    "d3": "^7.4.0",
-    "d3-force": "^3.0.0",
-    "react-dom": "^17.0.0",
-    "react-flow": "^1.0.3",
-    "react-flow-renderer": "^10.0.6",
-    "typescript": "^4.6.3"
+    "reagraph": "^1.0.2"
   },
   "devDependencies": {
-    "react": "^17.0.0",
-    "recoil": "^0.7.2",
     "@babel/core": "^7.17.8",
-    "@storybook/addon-actions": "^6.4.22",
-    "@storybook/addon-essentials": "^6.4.22",
-    "@storybook/addon-interactions": "^6.4.22",
-    "@storybook/addon-links": "^6.4.22",
-    "@storybook/react": "^6.4.22",
+    "@mdx-js/react": "^2.1.1",
+    "@storybook/addon-actions": "^6.5.6",
+    "@storybook/addon-essentials": "^6.5.6",
+    "@storybook/addon-interactions": "^6.5.6",
+    "@storybook/addon-links": "^6.5.6",
+    "@storybook/react": "^6.5.6",
     "@storybook/testing-library": "^0.0.11",
-    "@types/d3": "^7.1.0",
-    "babel-loader": "^8.2.4"
+    "babel-loader": "^8.2.4",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "recoil": "^0.7.2",
+    "typescript": "^4.7.2"
   },
   "peerDependencies": {
-    "react": "^17.0.0",
     "@storybook/addons": "^6.4.0",
+    "react": "^17.0.0 || ^18.0.0",
     "recoil": ">= 0.6.1"
   },
   "types": "./dist/preset.d.ts",

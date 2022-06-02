@@ -1,159 +1,36 @@
-import React, {
-  ReactElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react"
-
-import ReactFlow, { MiniMap, Controls, Node, Edge } from "react-flow-renderer"
+import React, { ReactElement, useRef, useState } from "react"
 import { useChannel } from "@storybook/api"
-import * as d3 from "d3"
-import { SimulationLinkDatum, SimulationNodeDatum } from "d3-force"
+import {
+  GraphCanvas,
+  GraphCanvasRef,
+  GraphEdge,
+  GraphNode,
+  lightTheme,
+  useSelection,
+} from "reagraph"
+import { RecoilEdge, RecoilNode } from "../types"
+import { FlowInfo } from "./info"
 
-interface RecoilNode extends Node {
-  data: {
-    label: ReactElement
-    contents: any
-    type: "atom" | "selector"
-  }
-}
-type RecoilNodeWithoutPosition = Omit<RecoilNode, "position">
-interface RecoilEdge extends Edge {}
-
-interface RecoilSimulationNodeDatum extends SimulationNodeDatum {
-  recoilNode: RecoilNodeWithoutPosition
-}
-
-const useForceDirectedGraph = ({
-  nodes,
-  edges,
-}: {
-  nodes: RecoilNodeWithoutPosition[]
-  edges: RecoilEdge[]
-}): { nodes: RecoilNode[]; edges: RecoilEdge[]; firstRender: boolean } => {
-  const [positionedNodes, setPositionedNodes] = useState<RecoilNode[]>([])
-  const [firstRender, setFirstRender] = useState<boolean>(false)
-  const simNodeMapRef = useRef<{ [k: string]: RecoilSimulationNodeDatum }>({})
-
-  const simNodes: RecoilSimulationNodeDatum[] = useMemo(
-    () =>
-      nodes.map((node, index) => {
-        if (simNodeMapRef.current[node.id]) {
-          simNodeMapRef.current[node.id].recoilNode = node
-          return simNodeMapRef.current[node.id]
-        }
-
-        return (simNodeMapRef.current[node.id] = {
-          index,
-          recoilNode: node,
-          x: 0,
-          y: 0,
-        })
-      }),
-    [nodes]
-  )
-
-  const fakeFamilyLinks: SimulationLinkDatum<RecoilSimulationNodeDatum>[] =
-    useMemo(() => {
-      const familyGroups: { [k: string]: RecoilSimulationNodeDatum[] } =
-        simNodes.reduce((groups, node) => {
-          if (!node.recoilNode.id.includes("__")) return []
-          const [familyName] = node.recoilNode.id.split("__")
-          groups[familyName] ||= []
-          groups[familyName].push(node)
-
-          return groups
-        }, {}) || {}
-
-      const fakeLinks = Object.entries(familyGroups)
-        .map(([familyName, nodes]) =>
-          nodes.flatMap((source) =>
-            nodes
-              .filter((target) => target !== source)
-              .map((target) => ({
-                source: source.index || 0,
-                target: target.index || 0,
-              }))
-          )
-        )
-        .flat()
-      return fakeLinks
-    }, [simNodes])
-
-  useEffect(() => {
-    const sim = d3
-      .forceSimulation<RecoilSimulationNodeDatum>(simNodes)
-      .force("charge", d3.forceManyBody().strength(2))
-      .force("center", d3.forceCenter(500 / 2, 500 / 2).strength(1.5))
-      .force(
-        "y",
-        d3
-          .forceY<RecoilSimulationNodeDatum>()
-          .y(({ recoilNode }) => (recoilNode.data.type === "atom" ? -100 : 0))
-          .strength(0.5)
-      )
-      .force(
-        "collision",
-        d3.forceCollide().radius((d) => 100)
-      )
-      .force(
-        "link",
-        d3.forceLink().links([
-          ...fakeFamilyLinks,
-          ...edges
-            .map(({ source, target }) => ({
-              source: simNodes.findIndex(
-                ({ recoilNode }) => recoilNode.id === source
-              ),
-              target: simNodes.findIndex(
-                ({ recoilNode }) => recoilNode.id === target
-              ),
-            }))
-            .filter(({ source, target }) => {
-              if (source !== -1 && target !== -1) return true
-              return false
-            }),
-        ])
-      )
-      .on("tick", () => {
-        setPositionedNodes(
-          simNodes.map(({ recoilNode, x, y }) => ({
-            ...recoilNode,
-            position: { x: x || 0, y: y || 0 },
-          }))
-        )
-      })
-      .on("end", () => {
-        setFirstRender(true)
-      })
-
-    return () => {
-      sim.stop()
-    }
-  }, [nodes, edges])
-
-  return { edges, nodes: positionedNodes, firstRender }
-}
+const RECOIL_BLUE = "#5a91ea"
 
 const useRemoteRecoilNodesAndEdges = () => {
   const [nodesAndEdges, setNodesAndEdges] = useState<{
-    nodes: RecoilNodeWithoutPosition[]
+    nodes: RecoilNode[]
     edges: RecoilEdge[]
   }>({ nodes: [], edges: [] })
 
   useChannel(
     {
       "recoil-flow-changed": ({
-        nodes: n,
-        edges: e,
+        nodes,
+        edges,
       }: {
-        nodes: RecoilNodeWithoutPosition[]
+        nodes: RecoilNode[]
         edges: RecoilEdge[]
       }) => {
         setNodesAndEdges({
-          nodes: n,
-          edges: e,
+          nodes,
+          edges,
         })
       },
     },
@@ -165,22 +42,68 @@ const useRemoteRecoilNodesAndEdges = () => {
 
 export const FlowGraph = () => {
   const { nodes, edges } = useRemoteRecoilNodesAndEdges()
-  const { nodes: pNodes, firstRender } = useForceDirectedGraph({ nodes, edges })
+  const graphRef = useRef<GraphCanvasRef | null>(null)
+  const { selections, setSelections, onNodeClick, onCanvasClick } =
+    useSelection({
+      ref: graphRef,
+      nodes,
+      edges,
+    })
+
+  const noData = nodes.length + edges.length === 0
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      {!firstRender && <div>{"Generating Graph..."}</div>}
-      {firstRender && (
-        <ReactFlow
-          nodes={pNodes}
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        // this should switch flex direction depending on the panel position
+        gap: "1px",
+        background: "rgba(0,0,0,0.1)",
+      }}
+    >
+      {noData && <div>{"No Recoil Nodes found"}</div>}
+      <div style={{ flexGrow: 1, position: "relative" }}>
+        <GraphCanvas
+          ref={graphRef}
+          nodes={nodes}
           edges={edges}
-          fitView
-          nodesDraggable={false}
-          nodesConnectable={false}
-        >
-          <Controls showInteractive={false} />
-          <MiniMap />
-        </ReactFlow>
-      )}
+          cameraMode="rotate"
+          layoutType="treeTd3d"
+          onNodeClick={onNodeClick}
+          onCanvasClick={onCanvasClick}
+          selections={selections}
+          theme={{
+            ...lightTheme,
+            node: {
+              ...lightTheme.node,
+              activeFill: RECOIL_BLUE,
+              activeColor: RECOIL_BLUE,
+            },
+            ring: {
+              ...lightTheme.ring,
+              activeFill: RECOIL_BLUE,
+              fill: RECOIL_BLUE,
+            },
+            edge: {
+              ...lightTheme.edge,
+              activeColor: RECOIL_BLUE,
+              activeFill: RECOIL_BLUE,
+            },
+            arrow: {
+              ...lightTheme.arrow,
+              activeFill: RECOIL_BLUE,
+            },
+          }}
+        />
+      </div>
+      <FlowInfo
+        nodes={nodes}
+        edges={edges}
+        selectedNodeId={selections[0] || null}
+        onSelectNode={(id) => setSelections([id])}
+        onClearNode={() => setSelections([])}
+      ></FlowInfo>
     </div>
   )
 }
