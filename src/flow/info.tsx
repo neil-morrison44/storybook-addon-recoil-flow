@@ -13,7 +13,11 @@ const RecoilNodeList = ({
       {nodes.map((node) => (
         <li
           key={node.id}
-          style={{ cursor: "pointer", fontSize: "1rem" }}
+          style={{
+            cursor: "pointer",
+            fontSize: "1rem",
+            wordBreak: "break-all",
+          }}
           onClick={() => onSelectNode(node.id)}
         >
           {node.label} {`(${node.data.type})`}
@@ -64,7 +68,9 @@ export const FlowInfo = ({
   }, [selectedNode])
 
   return (
-    <div style={{ aspectRatio: "1 / 1", background: "white" }}>
+    <div
+      style={{ aspectRatio: "1 / 1", background: "white", overflow: "auto" }}
+    >
       <div
         style={{
           fontSize: "1.5rem",
@@ -96,7 +102,6 @@ export const FlowInfo = ({
             display: "flex",
             flexDirection: "column",
             gap: "12px",
-            overflow: "auto",
           }}
         >
           <h2
@@ -104,6 +109,7 @@ export const FlowInfo = ({
               minWidth: "80%",
               paddingBottom: "4px",
               borderBottom: "1px solid rgba(0,0,0,0.1)",
+              wordBreak: "break-word",
             }}
           >
             {selectedNode.label}
@@ -114,9 +120,10 @@ export const FlowInfo = ({
                 border: "1px solid rgba(0,0,0,0.4)",
                 borderRadius: 10,
                 marginTop: "5px",
+                overflow: "auto",
               }}
             >
-              {JSON.stringify(selectedNode.data.contents)}
+              {JSON.stringify(selectedNode.data.contents, null, 2)}
             </pre>
           </div>
           {selectedNodeConnections.parents.length > 0 && (

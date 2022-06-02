@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-recoil-flow",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Shows a graph of the current recoil state",
   "main": "dist/preset.js",
   "scripts": {
