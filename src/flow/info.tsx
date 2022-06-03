@@ -1,5 +1,6 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { RecoilEdge, RecoilNode } from "../types"
+import { css, jsx } from "@emotion/react"
 
 const RecoilNodeList = ({
   nodes,
@@ -10,21 +11,28 @@ const RecoilNodeList = ({
 }) => {
   return (
     <ul
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-        overflow: "auto",
-      }}
+      css={css`
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: auto;
+        margin: 0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      `}
     >
       {nodes.map((node) => (
         <li
           key={node.id}
-          style={{
-            cursor: "pointer",
-            fontSize: "1rem",
-            wordBreak: "break-all",
-          }}
+          css={css`
+            cursor: pointer;
+            fontsize: 1rem;
+            word-break: break-all;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          `}
           onClick={() => onSelectNode(node.id)}
         >
           {node.label} {`(${node.data.type})`}
@@ -76,88 +84,91 @@ export const FlowInfo = ({
 
   return (
     <div
-      style={{
-        aspectRatio: "1 / 1",
-        background: "white",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
+      css={css`
+        aspect-ratio: 1 / 1;
+        background: white;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      `}
     >
       <div
-        style={{
-          fontSize: "1.5rem",
-          width: "100%",
-          borderBottom: "1px solid rgba(0,0,0,0.1)",
-          padding: "10px",
-        }}
+        css={css`
+          font-size: 1.25rem;
+          width: 100%;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+          padding: 10px;
+        `}
       >
         {selectedNode && (
           <div
             role="button"
             onClick={onClearNode}
-            style={{ fontSize: "0.875rem", opacity: 0.8, cursor: "pointer" }}
+            css={css`
+              font-size: 0.875rem;
+              opacity: 0.8;
+              cursor: pointer;
+              margin-bottom: 2px;
+              &:hover {
+                text-decoration: underline;
+              }
+            `}
           >
             {"< Atoms & Selectors"}
           </div>
         )}
-        {selectedNode
-          ? `${selectedNode.data.type === "atom" ? "Atom" : "Selector"} Details`
-          : "Atoms & Selectors"}
+        {selectedNode ? (
+          <span
+            css={css`
+              word-break: break-all;
+            `}
+          >
+            {`${selectedNode.data.type === "atom" ? "Atom" : "Selector"}: `}
+            <b>{selectedNode.label}</b>
+          </span>
+        ) : (
+          "Atoms & Selectors"
+        )}
       </div>
       {!selectedNodeId && (
         <RecoilNodeList nodes={nodes} onSelectNode={onSelectNode} />
       )}
       {selectedNode && (
         <div
-          style={{
-            padding: "12px",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "auto",
-            gap: "12px",
-          }}
+          css={css`
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: auto;
+            gap: 12px;
+          `}
         >
-          <h2
-            style={{
-              minWidth: "80%",
-              paddingBottom: "4px",
-              borderBottom: "1px solid rgba(0,0,0,0.1)",
-              wordBreak: "break-word",
-            }}
+          <pre
+            css={css`
+              border: 1px solid rgba(0, 0, 0, 0.4);
+              border-radius: 10px;
+              margin: 0;
+              word-break: break-word;
+              background: #2b2b2b;
+              color: white;
+            `}
           >
-            {selectedNode.label}
-          </h2>
+            {JSON.stringify(selectedNode.data.contents, null, 2)}
+          </pre>
           <div>
-            <pre
-              style={{
-                border: "1px solid rgba(0,0,0,0.4)",
-                borderRadius: 10,
-                marginTop: "5px",
-                wordBreak: "break-word",
-              }}
-            >
-              {JSON.stringify(selectedNode.data.contents, null, 2)}
-            </pre>
+            <b>{"Parents:"}</b>
+            <RecoilNodeList
+              nodes={selectedNodeConnections.parents}
+              onSelectNode={onSelectNode}
+            />
           </div>
-          {selectedNodeConnections.parents.length > 0 && (
-            <div>
-              <b>{"Parents:"}</b>
-              <RecoilNodeList
-                nodes={selectedNodeConnections.parents}
-                onSelectNode={onSelectNode}
-              />
-            </div>
-          )}
-          {selectedNodeConnections.children.length > 0 && (
-            <div>
-              <b>{"Children:"}</b>
-              <RecoilNodeList
-                nodes={selectedNodeConnections.children}
-                onSelectNode={onSelectNode}
-              />
-            </div>
-          )}
+          <div>
+            <b>{"Children:"}</b>
+            <RecoilNodeList
+              nodes={selectedNodeConnections.children}
+              onSelectNode={onSelectNode}
+            />
+          </div>
         </div>
       )}
     </div>

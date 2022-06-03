@@ -1,16 +1,10 @@
-import React, { ReactElement, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useChannel } from "@storybook/api"
-import {
-  GraphCanvas,
-  GraphCanvasRef,
-  GraphEdge,
-  GraphNode,
-  lightTheme,
-  useSelection,
-} from "reagraph"
+import { GraphCanvas, GraphCanvasRef, lightTheme, useSelection } from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
 import { FlowInfo } from "./info"
 import { usePanelPosition } from "../hooks/usePanelPosition"
+import { css, jsx } from "@emotion/react"
 
 const RECOIL_BLUE = "#5a91ea"
 
@@ -55,14 +49,14 @@ export const FlowGraph = () => {
   const noData = nodes.length + edges.length === 0
   return (
     <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        gap: "1px",
-        background: "rgba(0,0,0,0.1)",
-        flexDirection: panelPosition === "bottom" ? "row" : "column",
-      }}
+      css={css`
+        width: 100%;
+        height: 100%;
+        display: flex;
+        gap: 1px;
+        background: rgba(0, 0, 0, 0.1);
+        flex-direction: ${panelPosition === "bottom" ? "row" : "column"};
+      `}
     >
       {noData && <div>{"No Recoil Nodes found"}</div>}
       <div style={{ flexGrow: 1, position: "relative" }}>

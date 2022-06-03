@@ -1,6 +1,6 @@
 {
   "name": "storybook-addon-recoil-flow",
-  "version": "0.2.4",
+  "version": "1.0.0",
   "description": "Shows a graph of the current recoil state",
   "main": "dist/preset.js",
   "scripts": {
@@ -37,6 +37,7 @@
   "author": "Neil Morrison",
   "license": "MIT",
   "dependencies": {
+    "@emotion/react": "^11.9.0",
     "reagraph": "^1.0.2"
   },
   "devDependencies": {
