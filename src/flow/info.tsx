@@ -156,6 +156,12 @@ export const FlowInfo = ({
             {JSON.stringify(selectedNode.data.contents, null, 2)}
           </pre>
           <div>
+            {selectedNode.data.lastUpdate < Infinity &&
+              `Last changed ${selectedNode.data.lastUpdate} snapshots ago`}
+            {selectedNode.data.lastUpdate >= Infinity &&
+              `Has never changed value`}
+          </div>
+          <div>
             <b>{"Parents:"}</b>
             <RecoilNodeList
               nodes={selectedNodeConnections.parents}
