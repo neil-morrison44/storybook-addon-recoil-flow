@@ -5,6 +5,7 @@ export interface RecoilNode extends GraphNode {
   data: {
     contents: any
     type: "atom" | "selector"
+    lastUpdate: number
   }
 }
 
