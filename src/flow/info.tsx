@@ -17,6 +17,7 @@ const RecoilNodeList = ({
         gap: 10px;
         overflow: auto;
         margin: 0;
+        padding: 15px;
         padding-top: 10px;
         padding-bottom: 10px;
       `}
@@ -26,8 +27,20 @@ const RecoilNodeList = ({
           key={node.id}
           css={css`
             cursor: pointer;
-            fontsize: 1rem;
+            font-size: 1rem;
             word-break: break-all;
+            display: flex;
+            align-items: center;
+
+            &::before {
+              --size: 10px;
+              content: "";
+              width: var(--size);
+              height: var(--size);
+              border-radius: var(--size);
+              background-color: ${node.fill};
+              margin-right: 1em;
+            }
 
             &:hover {
               text-decoration: underline;

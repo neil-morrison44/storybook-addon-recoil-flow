@@ -1,7 +1,7 @@
 import React from "react"
-import { useRecoilValue } from "recoil"
+import { useRecoilValue, useSetRecoilState } from "recoil"
 import "./button.css"
-import { SelectorOne, SelectorTwo } from "./testRecoilThings"
+import { AtomOne, SelectorOne, SelectorTwo } from "./testRecoilThings"
 
 interface ButtonProps {
   /**
@@ -43,6 +43,8 @@ export const Button = ({
   useRecoilValue(SelectorOne)
   useRecoilValue(SelectorTwo)
 
+  const increaseHelloCount = useSetRecoilState(AtomOne)
+
   return (
     <button
       type="button"
@@ -51,6 +53,10 @@ export const Button = ({
       )}
       style={{ backgroundColor }}
       {...props}
+      onClick={() => {
+        increaseHelloCount((current) => `${current}, Hello`)
+        props.onClick?.()
+      }}
     >
       {label}
     </button>
