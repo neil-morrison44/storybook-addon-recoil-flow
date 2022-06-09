@@ -39,7 +39,7 @@ const RecoilNodeList = ({
               height: var(--size);
               border-radius: var(--size);
               background-color: ${node.fill};
-              margin-right: 1em;
+              margin-right: 15px;
             }
 
             &:hover {
