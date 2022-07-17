@@ -40,7 +40,7 @@
     "@emotion/react": "^11.9.0",
     "just-compare": "^2.1.0",
     "mix-css-color": "^0.2.0",
-    "reagraph": "^1.0.3"
+    "reagraph": "^2.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",

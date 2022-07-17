@@ -1,6 +1,12 @@
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useChannel } from "@storybook/api"
-import { GraphCanvas, GraphCanvasRef, lightTheme, useSelection } from "reagraph"
+import {
+  GraphCanvas,
+  GraphCanvasRef,
+  GraphNode,
+  lightTheme,
+  useSelection,
+} from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
 import { FlowInfo } from "./info"
 import { usePanelPosition } from "../hooks/usePanelPosition"
@@ -38,13 +44,18 @@ const useRemoteRecoilNodesAndEdges = () => {
 export const FlowGraph = () => {
   const { nodes, edges } = useRemoteRecoilNodesAndEdges()
   const graphRef = useRef<GraphCanvasRef | null>(null)
-  const { selections, setSelections, onNodeClick, onCanvasClick } =
-    useSelection({
-      ref: graphRef,
-      nodes,
-      edges,
-    })
+  const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const panelPosition = usePanelPosition()
+
+  const onNodeClick = useCallback(({ id }: { id: string }) => {
+    setSelectedNode(id)
+    graphRef.current?.centerGraph([id])
+  }, [])
+
+  const onCanvasClick = useCallback(() => {
+    setSelectedNode(null)
+    graphRef.current?.centerGraph([])
+  }, [])
 
   const noData = nodes.length + edges.length === 0
   return (
@@ -68,13 +79,17 @@ export const FlowGraph = () => {
           layoutType="treeTd3d"
           onNodeClick={onNodeClick}
           onCanvasClick={onCanvasClick}
-          selections={selections}
+          selections={selectedNode ? [selectedNode] : []}
           theme={{
             ...lightTheme,
             node: {
               ...lightTheme.node,
               activeFill: RECOIL_BLUE,
-              activeColor: RECOIL_BLUE,
+              label: {
+                ...lightTheme.node.label,
+                color: RECOIL_BLUE,
+                activeColor: RECOIL_BLUE,
+              },
             },
             ring: {
               ...lightTheme.ring,
@@ -83,8 +98,12 @@ export const FlowGraph = () => {
             },
             edge: {
               ...lightTheme.edge,
-              activeColor: RECOIL_BLUE,
               activeFill: RECOIL_BLUE,
+              label: {
+                ...lightTheme.edge.label,
+                color: RECOIL_BLUE,
+                activeColor: RECOIL_BLUE,
+              },
             },
             arrow: {
               ...lightTheme.arrow,
@@ -96,9 +115,9 @@ export const FlowGraph = () => {
       <FlowInfo
         nodes={nodes}
         edges={edges}
-        selectedNodeId={selections[0] || null}
-        onSelectNode={(id) => setSelections([id])}
-        onClearNode={() => setSelections([])}
+        selectedNodeId={selectedNode}
+        onSelectNode={onNodeClick}
+        onClearNode={onCanvasClick}
       ></FlowInfo>
     </div>
   )

@@ -44,7 +44,7 @@ export const useRecoilNodesAndEdges = () => {
           id: key,
           label: key,
           fill: mix("#EFC580", "#AACBD2", colourShift * 100).hex,
-          size: hasChanged ? 14 : 8,
+          size: hasChanged ? 12 : 8,
           data: {
             contents: value.contents,
             lastUpdate: framesSinceLastChange,
@@ -64,7 +64,7 @@ export const useRecoilNodesAndEdges = () => {
           source: dep.key,
           target: snapshotNode.key,
           animated: true,
-          size: 3,
+          size: 2,
         }))
       })
     )

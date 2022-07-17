@@ -7,7 +7,7 @@ const RecoilNodeList = ({
   onSelectNode,
 }: {
   nodes: RecoilNode[]
-  onSelectNode: (id: RecoilNode["id"]) => void
+  onSelectNode: (opts: { id: RecoilNode["id"] }) => void
 }) => {
   return (
     <ul
@@ -39,6 +39,7 @@ const RecoilNodeList = ({
               height: var(--size);
               border-radius: var(--size);
               background-color: ${node.fill};
+              flex-shrink: 0;
               margin-right: 15px;
             }
 
@@ -46,7 +47,7 @@ const RecoilNodeList = ({
               text-decoration: underline;
             }
           `}
-          onClick={() => onSelectNode(node.id)}
+          onClick={() => onSelectNode({ id: node.id })}
         >
           {node.label} {`(${node.data.type})`}
         </li>
@@ -65,7 +66,7 @@ export const FlowInfo = ({
   nodes: RecoilNode[]
   edges: RecoilEdge[]
   selectedNodeId?: RecoilNode["id"] | null
-  onSelectNode: (id: RecoilNode["id"]) => void
+  onSelectNode: (opts: { id: RecoilNode["id"] }) => void
   onClearNode: () => void
 }) => {
   const selectedNode = useMemo(
