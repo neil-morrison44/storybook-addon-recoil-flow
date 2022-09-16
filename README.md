@@ -22,13 +22,9 @@ Ensure that this addon & whichever one is providing the RecoilRoot are in the co
 - Install via npm / yarn
 - The decorator provides a `RecoilRoot` with `overrides` set to false so the method in 1 will work without another decorator (but you'll not be able to set up a custom initialiser)
 
-![Screenshot](/images/screenshot.png)
+![Screenshot 1](/images/screenshot_1.png)
 
-## Known Issues
-
-- ~~It's a bit ugly~~ No longer ugly
-- ~~The graph doesn't lay itself out very well~~ Now it does
-- ~~We're not using most of the features of React Flow so we could replace it with something smaller~~ Switched to https://github.com/reaviz/reagraph
+![Screenshot 2](/images/screenshot_2.png)
 
 ## Parameters
 

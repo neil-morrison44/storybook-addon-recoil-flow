@@ -1,12 +1,6 @@
 import { useCallback, useRef, useState } from "react"
 import { useChannel } from "@storybook/api"
-import {
-  GraphCanvas,
-  GraphCanvasRef,
-  GraphNode,
-  lightTheme,
-  useSelection,
-} from "reagraph"
+import { GraphCanvas, GraphCanvasRef, lightTheme } from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
 import { FlowInfo } from "./info"
 import { usePanelPosition } from "../hooks/usePanelPosition"
@@ -87,7 +81,7 @@ export const FlowGraph = () => {
               activeFill: RECOIL_BLUE,
               label: {
                 ...lightTheme.node.label,
-                color: RECOIL_BLUE,
+                color: "#333",
                 activeColor: RECOIL_BLUE,
               },
             },
