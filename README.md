@@ -42,3 +42,7 @@ The `recoilFlow` parameter has the following optional options:
 The `keys` array gets used in a `.startsWith` to filter out nodes so the long generated SelectorFamilyKeys can be matched with just the manually entered bit.
 
 `showConnected` will show nodes which are connected to those in the `keys` array as well (defaults to true)
+
+
+## Known issues
+- if the plug-in panel is _after_ certain other plugins (e.g "Interactions" there's a bug in Storybook's css which'll cause this plugin to render improperly.
