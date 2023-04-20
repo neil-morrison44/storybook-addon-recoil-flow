@@ -1,9 +1,17 @@
+// prettier-ignore
 import React from "react"
+// prettier-ignore
 import { ComponentStory, ComponentMeta } from "@storybook/react"
+// prettier-ignore
 import { withRecoilFlow } from "../dist/decorator"
+// prettier-ignore
 import { Button } from "./Button"
+// prettier-ignore
 import { RecoilRoot } from "recoil"
+// prettier-ignore
 import { AtomFour } from "./testRecoilThings"
+
+console.log("RV: ", React.version)
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
