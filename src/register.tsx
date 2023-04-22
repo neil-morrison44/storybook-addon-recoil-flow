@@ -3,6 +3,8 @@ import { addons, types } from "@storybook/addons"
 import { AddonPanel } from "@storybook/components"
 import { FlowGraph } from "./flow/graph"
 
+console.log("RV:", React.version)
+
 const ADDON_ID = "recoil-flow"
 const PANEL_ID = `${ADDON_ID}/recoil-flow`
 
