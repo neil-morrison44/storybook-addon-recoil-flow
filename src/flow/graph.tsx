@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useChannel } from "@storybook/api"
 import { GraphCanvas, GraphCanvasRef, lightTheme } from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
@@ -14,23 +14,40 @@ const useRemoteRecoilNodesAndEdges = () => {
     edges: RecoilEdge[]
   }>({ nodes: [], edges: [] })
 
-  useChannel(
-    {
-      "recoil-flow-changed": ({
-        nodes,
-        edges,
-      }: {
-        nodes: RecoilNode[]
-        edges: RecoilEdge[]
-      }) => {
+  useEffect(() => {
+    const onMessage = (ev) => {
+      if (ev.data.name === "recoil-flow-changed") {
+        const { nodes, edges } = ev.data as {
+          nodes: RecoilNode[]
+          edges: RecoilEdge[]
+        }
         setNodesAndEdges({
           nodes,
           edges,
         })
-      },
-    },
-    []
-  )
+      }
+    }
+    window.addEventListener("message", onMessage)
+    return () => window.removeEventListener("message", onMessage)
+  }, [])
+
+  // useChannel(
+  //   {
+  //     "recoil-flow-changed": ({
+  //       nodes,
+  //       edges,
+  //     }: {
+  //       nodes: RecoilNode[]
+  //       edges: RecoilEdge[]
+  //     }) => {
+  //       setNodesAndEdges({
+  //         nodes,
+  //         edges,
+  //       })
+  //     },
+  //   },
+  //   []
+  // )
 
   return nodesAndEdges
 }
@@ -61,6 +78,7 @@ export const FlowGraph = () => {
         gap: 1px;
         background: rgba(0, 0, 0, 0.1);
         flex-direction: ${panelPosition === "bottom" ? "row" : "column"};
+        color: #333;
       `}
     >
       {noData && <div>{"No Recoil Nodes found"}</div>}

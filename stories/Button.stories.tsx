@@ -11,7 +11,7 @@ import { RecoilRoot } from "recoil"
 // prettier-ignore
 import { AtomFour } from "./testRecoilThings"
 
-console.log("RV: ", React.version)
+// console.log("RV: ", React.version)
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
