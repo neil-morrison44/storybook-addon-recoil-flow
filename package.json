@@ -37,12 +37,12 @@
   "author": "Neil Morrison",
   "license": "MIT",
   "dependencies": {
-    "@emotion/react": "^11.10.6",
     "just-compare": "^2.3.0",
-    "mix-css-color": "^0.2.0",
-    "reagraph": "^4.7.0"
+    "mix-css-color": "^0.2.0"
   },
   "devDependencies": {
+    "@emotion/react": "^11.10.6",
+    "reagraph": "^4.7.0",
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-react": "^7.18.6",
