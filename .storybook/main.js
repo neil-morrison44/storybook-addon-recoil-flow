@@ -9,5 +9,8 @@ module.exports = {
     "../dist/preset.js",
     "@storybook/addon-interactions",
   ],
-  framework: "@storybook/react",
+  framework: {
+    name: "@storybook/react-webpack5",
+    options: {},
+  },
 }

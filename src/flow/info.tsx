@@ -20,6 +20,7 @@ const RecoilNodeList = ({
         padding: 15px;
         padding-top: 10px;
         padding-bottom: 10px;
+        color: #333;
       `}
     >
       {nodes.map((node) => (
