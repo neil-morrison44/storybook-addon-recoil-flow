@@ -72,8 +72,11 @@ export const FlowGraph = () => {
   return (
     <div
       css={css`
-        width: 100%;
-        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
         display: flex;
         gap: 1px;
         background: rgba(0, 0, 0, 0.1);
