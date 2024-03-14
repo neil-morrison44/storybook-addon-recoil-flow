@@ -1,6 +1,6 @@
 module.exports = {
   stories: [
-    "../stories/**/*.stories.mdx",
+    // "../stories/**/*.stories.mdx",
     "../stories/**/*.stories.@(js|jsx|ts|tsx)",
   ],
   addons: [
@@ -10,7 +10,8 @@ module.exports = {
     "@storybook/addon-interactions",
   ],
   framework: {
-    name: "@storybook/react-webpack5",
-    options: {},
+    name: "@storybook/react-vite",
+    options: {
+    },
   },
 }

@@ -7,7 +7,7 @@ const result = await esbuild.build({
   minify: false,
   platform: "browser",
   format: "esm",
-  external: ["@storybook/addons"],
+  external: ["@storybook/preview-api", "@storybook/manager-api"],
 })
 
 console.info(result)

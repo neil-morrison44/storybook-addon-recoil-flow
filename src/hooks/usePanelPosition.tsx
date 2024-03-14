@@ -4,24 +4,24 @@ export const usePanelPosition = () => {
   const [position, setPosition] = useState<"bottom" | "right">("bottom")
 
   useEffect(() => {
-    const rootParent = document.querySelector(
+    const rootElem = document.querySelector(
       "#storybook-panel-root"
-    )?.parentElement
-    if (!rootParent) return
+    )
+    if (!rootElem) return
 
     const updatePosition = () => {
-      const newPosition = rootParent.style.left === "0px" ? "bottom" : "right"
+      const boundingBox = rootElem.getBoundingClientRect()
+      const newPosition = boundingBox.width > boundingBox.height ? "bottom" : "right"
       setPosition(newPosition)
     }
 
     updatePosition()
 
-    const observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
-        if (mutation.type === "attributes") updatePosition()
-      })
+    const observer = new ResizeObserver(function (){
+      updatePosition()
     })
-    observer.observe(rootParent, { attributes: true })
+
+    observer.observe(rootElem)
     return () => observer.disconnect()
   }, [])
 
