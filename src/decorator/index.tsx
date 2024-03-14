@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { makeDecorator, useChannel, useCallback } from "@storybook/addons"
+import { makeDecorator, useChannel, useCallback } from "@storybook/preview-api"
 import { useRecoilNodesAndEdges } from "../hooks/useRecoilNodesAndEdges"
 import { RecoilRoot } from "recoil"
 

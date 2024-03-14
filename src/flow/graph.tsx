@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { useChannel } from "@storybook/api"
 import { GraphCanvas, GraphCanvasRef, lightTheme } from "reagraph"
 import { RecoilEdge, RecoilNode } from "../types"
 import { FlowInfo } from "./info"

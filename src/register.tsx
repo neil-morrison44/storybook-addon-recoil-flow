@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react"
-import { addons, types } from "@storybook/addons"
+import { addons, types } from "@storybook/manager-api"
 import { AddonPanel } from "@storybook/components"
 import { eightenRootedFlow } from "./sixteenEighteenShim"
-import { useChannel } from "@storybook/api"
+import { useChannel } from "@storybook/manager-api"
 import { RecoilEdge, RecoilNode } from "./types"
 
 // console.log("RV:", React.version)
@@ -63,8 +63,8 @@ addons.register(ADDON_ID, (api) => {
   addons.add(PANEL_ID, {
     type: types.PANEL,
     title: "Recoil Flow",
-    render: ({ active, key }) => (
-      <FlowAddonPanel active={Boolean(active)} key={key} />
+    render: ({ active }) => (
+      <FlowAddonPanel active={Boolean(active)} />
     ),
   })
 })
